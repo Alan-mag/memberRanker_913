@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="//cdn.muicss.com/mui-latest/css/mui.min.css" rel="stylesheet" type="text/css" />
+    <script src="//cdn.muicss.com/mui-latest/js/mui.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js" charset="utf-8"></script>
+    <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+    <link href="static/styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <h1>Town Hall Ranker</h1>
+
+    <div id="svg-wrapper"></div>
+
+    <script>
+        var w = 880;
+        var h = 450;
+        var padding = 40;
+
+        let dataset = [25, 25, 2, 2, 2, 2, 2];
+
+        var xScale = d3.scaleBand()
+            .domain(["Total", "Town Halls", "Ticket Event", "Tele TH", "Office Hour", "Empty Chair", "Other"])
+            .rangeRound([padding, w - padding])
+            .paddingInner(0.05);
+
+        var yScale = d3.scaleLinear()
+            .domain([30, 0])
+            .range([padding, h - padding]);
+
+        var svg = d3.select("#svg-wrapper")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h)
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 800 450")
+            .classed("svg-content-responsive", true);
+
+        svg.selectAll("rect")
+            .data(dataset)
+            .enter()
+            .append("rect")
+            .attr("x", function (d, i) {
+                return (i + 80) + (i * 800 / 7); // this should scale - fix
+                // return xScale();
+
+            })
+            .attr("y", function (d) {
+                // return h - d - padding; //Height minus data value
+                return h - yScale(30 - d);
+            })
+            .attr("width", 30)
+            .attr("height", function (d) {
+                //return d; //Just the data value
+                return yScale(33.2 - d); // needs to be scale (find correct values)
+            });
+
+        var xAxis = d3.axisBottom(xScale);
+        var yAxis = d3.axisLeft(yScale);
+
+        // call axis after svg generated
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + (h - padding) + ")")
+            .call(d3.axisBottom(xScale));
+
+        svg.append("g")
+            .attr("class", "y axis")
+            .attr("transform", "translate(" + padding + ", 0)")
+            .call(d3.axisLeft(yScale));
+
+        // now add titles to the axes
+        svg.append("text")
+            .attr("text-anchor", "middle")  // this makes it easy to center the text as the transform is applied to the anchor
+            .attr("transform", "translate(" + (padding / 4) + "," + (h / 2) + ")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+            .style("font-size", "14px")
+            .text("Number of Events");
+
+        svg.append("text")
+            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+            .attr("transform", "translate(" + (w / 2) + "," + (h - (padding / 5)) + ")")  // centre below axis
+            .style("font-size", "14px")
+            .text("Event Type");
+    </script>
+</body>
+
+</html>
